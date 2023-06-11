@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String @id @default(uuid())
+  name          String
+  email         String @unique
+  password_hash String
+
+  Fees Fee[]
+
+  @@map("users")
+}
+
+model Fee {
+  id                      String   @id @default(uuid())
+  payment_status          Boolean  @default(false)
+  payment_expiration_date DateTime
+  value_payment           Int
+  observation             String?
+
+  user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+
+  payment    Payment @relation(fields: [payment_id], references: [id])
+  payment_id String
+
+  @@map("fees")
+}
+
+model Payment {
+  id             String   @id @default(uuid())
+  payment_date   DateTime
+  payment_method String
+
+  Fees Fee[]
+
+  @@map("payments")
+}
